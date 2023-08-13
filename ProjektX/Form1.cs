@@ -11,7 +11,7 @@ namespace ProjektX
 
             GenerateDesign generate = new GenerateDesign(this);
             generate.startGenerate();
-            generate.dayGenerate();
+            generate.dayGenerate(DateTime.Today);
 
         }
 
