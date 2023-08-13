@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Globalization;
 using static System.Net.Mime.MediaTypeNames;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
+
 
 namespace ProjektX
 {
@@ -15,19 +17,23 @@ namespace ProjektX
         public Button[] day = new Button[35];
         public Button[] dayOfWeek = new Button[7];
         public Button month = new Button();
+        public Button[] previousNext = new Button[2];
         public Font fontDay = new Font("Arial", 15, FontStyle.Regular);
         public Font fontDayOfWeek = new Font("Arial", 15, FontStyle.Regular);
         public int interval = 1;
         public Form1 startForm;
+        public DataBase db;
+        public DateTime currentDate;
 
-        public GenerateDesign(Form1 form)
+        public GenerateDesign(Form1 form, DataBase db)
         {
             this.startForm = form;
+            this.db = db;
         }
 
         public void startGenerate()
         {
-            int locationX = 200;
+            int locationX = 30;
             int locationY = 30;
 
             this.month.Location = new Point(locationX, locationY);
@@ -52,8 +58,19 @@ namespace ProjektX
                 locationX += 100 + interval;
             }
 
-            locationX = 200;
+            locationX = 30;
             locationY += 60 + interval;
+
+
+            ContextMenuStrip dayMenu = new ContextMenuStrip();
+
+            ToolStripMenuItem copyMenuItem = new ToolStripMenuItem("Изменить цвет");
+            ToolStripMenuItem pasteMenuItem = new ToolStripMenuItem("Вставить");
+
+            dayMenu.Items.AddRange(new[] { copyMenuItem, pasteMenuItem });
+
+            copyMenuItem.Click += this.startForm.DayMenuClick1;
+            pasteMenuItem.Click += this.startForm.DayMenuClick2;
 
             for (int i = 0; i < day.Length; i++)
             {
@@ -63,20 +80,45 @@ namespace ProjektX
                 this.day[i].Location = new Point(locationX, locationY);
                 this.day[i].Font = fontDay;
                 this.day[i].Click += this.startForm.buttonDayClick;
+                this.day[i].ContextMenuStrip = dayMenu;
 
                 this.startForm.Controls.Add(day[i]);
 
-                locationX += 101;
+                locationX += 100 + interval;
                 if ((i + 1) % 7 == 0)
                 {
-                    locationX = 200;
+                    locationX = 30;
                     locationY += 100 + interval;
                 }
             }
+
+            for (int i = 0; i < previousNext.Length; i++)
+            {
+                this.previousNext[i] = new Button();
+                this.previousNext[i].Width = 350 + interval * 3;
+                this.previousNext[i].Height = 35;
+                this.previousNext[i].Location = new Point(locationX, locationY);
+                this.previousNext[i].Font = fontDay;
+                this.previousNext[i].Click += this.startForm.previousNextClick;
+                this.startForm.Controls.Add(previousNext[i]);
+                locationX += 350 + interval * 4;
+            }
+            previousNext[0].Text = "<";
+            previousNext[1].Text = ">";
+            previousNext[0].Name = "0";
+            previousNext[1].Name = "1";
+
+            this.startForm.Width = this.month.Right + 50;
+            this.startForm.Height = this.day[34].Top + 200;
         }
 
         public void dayGenerate(DateTime date)
         {
+            string[,] dataDb = new string[40, 2];
+            dataDb = db.getData(date);
+
+            this.clearDay();
+            this.currentDate = date;
             string monthYear = date.ToString("MMMM yyyy", CultureInfo.CurrentCulture);
             this.month.Text = monthYear.Substring(0, 1).ToUpper(CultureInfo.CurrentCulture) + monthYear.Substring(1);
 
@@ -89,24 +131,41 @@ namespace ProjektX
             this.dayOfWeek[6].Text = "Вс"; 
 
             int dayNow = (int)date.Day - 1;
-            DateTime startDay = date.Subtract(new TimeSpan(dayNow, 0, 0, 0));
+            DateTime startDay = date.AddDays(-dayNow);
+            DateTime reversDay = startDay;
 
-            for (int i = (int)startDay.DayOfWeek - 1, numDay = 1; i < day.Length; i++, numDay++)
+            int count = (int)startDay.DayOfWeek == 0 ? 6 : (int)startDay.DayOfWeek - 1;
+            int countRevers = count;
+
+            while (countRevers != 0)
             {
-                this.day[i].Text = numDay + "";
-                if (startDay == date)
+                reversDay = reversDay.AddDays(-1);
+                this.day[countRevers - 1].Text = reversDay.Day + "";
+                countRevers--;
+            }
+
+            for (int i = count, numDay = 1; i < day.Length; i++, numDay++)
+            {
+                this.day[i].Text = startDay.Day + "";
+                if (startDay == DateTime.Today)
                 {
                     this.day[i].BackColor = Color.LightGray;
                 }
 
-
                 startDay = startDay.AddDays(1);
-                if ((int)startDay.Day == 1)
-                {
-                    break;
-                }
+
             }
 
         }
+
+        private void clearDay()
+        {
+            for (int i = 0; i < day.Length; i++)
+            {
+                this.day[i].Text = "";
+                this.day[i].BackColor = Color.White;
+            }
+        }
+
     }
 }
