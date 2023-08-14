@@ -114,8 +114,7 @@ namespace ProjektX
 
         public void dayGenerate(DateTime date)
         {
-            string[,] dataDb = new string[40, 2];
-            dataDb = db.getData(date);
+            NoteDto[] dataDb = new NoteDto[1000];
 
             this.clearDay();
             this.currentDate = date;
@@ -133,6 +132,7 @@ namespace ProjektX
             int dayNow = (int)date.Day - 1;
             DateTime startDay = date.AddDays(-dayNow);
             DateTime reversDay = startDay;
+            dataDb = db.getData(startDay);
 
             int count = (int)startDay.DayOfWeek == 0 ? 6 : (int)startDay.DayOfWeek - 1;
             int countRevers = count;
@@ -141,19 +141,27 @@ namespace ProjektX
             {
                 reversDay = reversDay.AddDays(-1);
                 this.day[countRevers - 1].Text = reversDay.Day + "";
+                this.day[countRevers - 1].BackColor = Color.LightGray;
                 countRevers--;
             }
 
             for (int i = count, numDay = 1; i < day.Length; i++, numDay++)
             {
-                this.day[i].Text = startDay.Day + "";
+                this.day[i].Text = startDay.Day + "\n";
+                this.day[i].Name = startDay.ToString("d");
+                
+
                 if (startDay == DateTime.Today)
                 {
-                    this.day[i].BackColor = Color.LightGray;
+                    this.day[i].BackColor = Color.LightCyan;
                 }
 
                 startDay = startDay.AddDays(1);
 
+                if (numDay > (int)startDay.Day)
+                {
+                    this.day[i].BackColor = Color.LightGray;
+                }
             }
 
         }
