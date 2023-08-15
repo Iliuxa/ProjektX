@@ -8,8 +8,8 @@ namespace ProjektX
 {
     internal class NoteDto
     {
-        public string date;
-        public string note;
+        public DateTime date;
+        public string? note;
 
         public NoteDto() { }
     }

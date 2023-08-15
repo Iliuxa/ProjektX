@@ -47,8 +47,9 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1054, 690);
             Controls.Add(button1);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             Name = "Form1";
-            Text = "Form1";
+            Text = "Мяу";
             ResumeLayout(false);
         }
 

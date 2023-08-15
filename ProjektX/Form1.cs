@@ -18,6 +18,7 @@ namespace ProjektX
             generate.dayGenerate(DateTime.Today);
         }
 
+        // Клик на число
         public void buttonDayClick(object sender, EventArgs e)
         {
             Button button = sender as Button;
@@ -26,6 +27,7 @@ namespace ProjektX
             note.Show();
         }
 
+        // Клик на неделю
         public void buttonDayOfWeekClick(object sender, EventArgs e)
         {
             Button button = sender as Button;
@@ -42,6 +44,7 @@ namespace ProjektX
 
         }
 
+        // Переключение месяца
         public void previousNextClick(object sender, EventArgs e)
         {
             Button button = sender as Button;

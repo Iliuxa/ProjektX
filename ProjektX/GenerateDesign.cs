@@ -31,19 +31,20 @@ namespace ProjektX
             this.db = db;
         }
 
+        // создаёт кнопки
         public void startGenerate()
         {
             int locationX = 30;
             int locationY = 30;
-
+            // месяц
             this.month.Location = new Point(locationX, locationY);
             this.month.Width = 700 + interval * 7;
             this.month.Height = 60;
             this.month.Font = new Font("Arial", 16, FontStyle.Bold); ;
             this.startForm.Controls.Add(this.month);
 
+            // дни недели
             locationY += 60;
-
             for (int i = 0; i < dayOfWeek.Length; i++)
             {
                 this.dayOfWeek[i] = new Button();
@@ -57,21 +58,25 @@ namespace ProjektX
 
                 locationX += 100 + interval;
             }
+            this.dayOfWeek[0].Text = "Пн";
+            this.dayOfWeek[1].Text = "Вт";
+            this.dayOfWeek[2].Text = "Ср";
+            this.dayOfWeek[3].Text = "Чт";
+            this.dayOfWeek[4].Text = "Пт";
+            this.dayOfWeek[5].Text = "Сб";
+            this.dayOfWeek[6].Text = "Вс";
 
-            locationX = 30;
-            locationY += 60 + interval;
-
-
+            // контекстное меню
             ContextMenuStrip dayMenu = new ContextMenuStrip();
-
             ToolStripMenuItem copyMenuItem = new ToolStripMenuItem("Изменить цвет");
             ToolStripMenuItem pasteMenuItem = new ToolStripMenuItem("Вставить");
-
             dayMenu.Items.AddRange(new[] { copyMenuItem, pasteMenuItem });
-
             copyMenuItem.Click += this.startForm.DayMenuClick1;
             pasteMenuItem.Click += this.startForm.DayMenuClick2;
 
+            // дни
+            locationX = 30;
+            locationY += 60 + interval;
             for (int i = 0; i < day.Length; i++)
             {
                 this.day[i] = new Button();
@@ -92,6 +97,7 @@ namespace ProjektX
                 }
             }
 
+            // переключатель месяца
             for (int i = 0; i < previousNext.Length; i++)
             {
                 this.previousNext[i] = new Button();
@@ -112,60 +118,52 @@ namespace ProjektX
             this.startForm.Height = this.day[34].Top + 200;
         }
 
+        // Ставит чиселки в кнопки
         public void dayGenerate(DateTime date)
         {
-            NoteDto[] dataDb = new NoteDto[1000];
-
             this.clearDay();
             this.currentDate = date;
             string monthYear = date.ToString("MMMM yyyy", CultureInfo.CurrentCulture);
             this.month.Text = monthYear.Substring(0, 1).ToUpper(CultureInfo.CurrentCulture) + monthYear.Substring(1);
 
-            this.dayOfWeek[0].Text = "Пн";
-            this.dayOfWeek[1].Text = "Вт";
-            this.dayOfWeek[2].Text = "Ср";
-            this.dayOfWeek[3].Text = "Чт";
-            this.dayOfWeek[4].Text = "Пт";
-            this.dayOfWeek[5].Text = "Сб";
-            this.dayOfWeek[6].Text = "Вс"; 
-
             int dayNow = (int)date.Day - 1;
             DateTime startDay = date.AddDays(-dayNow);
-            DateTime reversDay = startDay;
-            dataDb = db.getData(startDay);
+            db.getData();
+            NoteDto[] dataDb = db.getDataMonth(startDay);
 
-            int count = (int)startDay.DayOfWeek == 0 ? 6 : (int)startDay.DayOfWeek - 1;
-            int countRevers = count;
+            int countRevers = (int)startDay.DayOfWeek == 0 ? 6 : (int)startDay.DayOfWeek - 1;
+            startDay = startDay.AddDays(-countRevers);
 
-            while (countRevers != 0)
+            int countDb = 0;
+            for (int i = 0; i < day.Length; i++)
             {
-                reversDay = reversDay.AddDays(-1);
-                this.day[countRevers - 1].Text = reversDay.Day + "";
-                this.day[countRevers - 1].BackColor = Color.LightGray;
-                countRevers--;
-            }
-
-            for (int i = count, numDay = 1; i < day.Length; i++, numDay++)
-            {
-                this.day[i].Text = startDay.Day + "\n";
+                this.day[i].Text = startDay.Day.ToString();
                 this.day[i].Name = startDay.ToString("d");
-                
 
-                if (startDay == DateTime.Today)
+                if (startDay == DateTime.Today) // покраска сегодняшнего дня
                 {
                     this.day[i].BackColor = Color.LightCyan;
                 }
 
-                startDay = startDay.AddDays(1);
+                if (db.noteLengthMonth > countDb) // комент под числом
+                {
+                    if (dataDb[countDb].date == startDay)
+                    {
+                        this.day[i].Text = "\n" + this.day[i].Text + "\n○---";
+                        countDb++;
+                    }
+                }
 
-                if (numDay > (int)startDay.Day)
+                if (this.currentDate.Month != startDay.Month) // покраска дня другого месяца
                 {
                     this.day[i].BackColor = Color.LightGray;
                 }
+                startDay = startDay.AddDays(1);
             }
 
         }
 
+        // чистит кнопки дня
         private void clearDay()
         {
             for (int i = 0; i < day.Length; i++)

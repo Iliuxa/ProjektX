@@ -12,7 +12,9 @@ namespace ProjektX
 {
     internal class DataBase
     {
-        public NoteDto note;
+        public NoteDto[] note = new NoteDto[1000];
+        public int noteLength = 0;
+        public int noteLengthMonth = 0;
 
         private string patchDb = "D:\\Internet Exploer\\DataBaseProjektX.txt";
 
@@ -33,56 +35,57 @@ namespace ProjektX
             }
         }
 
-        public NoteDto[] getData(DateTime date)
+        // Получает все данные из файла
+        public void getData()
         { 
             NoteDto[] result = new NoteDto[1000];
-            return readFile(date);
+            this.readFile();
         }
 
-        private NoteDto[] readFile(DateTime date)
+        // Получает конкретный месяц
+        public NoteDto[] getDataMonth(DateTime date)
         {
-            NoteDto[] result = new NoteDto[1000];
-
-            Regex regex = new Regex(@"{{(\w*)}}");
+            NoteDto[] resultDto = new NoteDto[45];
+            this.noteLengthMonth = 0;
+            for (int i = 0; i < this.noteLength; i++)
+            {
+                if (this.note[i].date > date.AddDays(-6) && this.note[i].date < date.AddDays(45))
+                {
+                    resultDto[this.noteLengthMonth] = this.note[i];
+                    this.noteLengthMonth++;
+                }
+            }
+            return resultDto;
+        }
+        
+        // Получает все данные из файла
+        private NoteDto[] readFile()
+        {
+            Regex regex = new Regex(@"{{(.*)}}");
             MatchCollection matches;
 
             using (StreamReader reader = new StreamReader(patchDb))
             {
                 string? line;
-                int i = 0;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    result[i] = new NoteDto();
+                    this.note[this.noteLength] = new NoteDto();
                     matches = regex.Matches(line);
                     if (matches.Count > 0)
                     {
                         line = line.Substring(2);
-                        result[i].date = line.Substring(0, line.Length - 2);      
-                        i++;
+                        this.note[this.noteLength].date = DateTime.ParseExact(line.Substring(0, line.Length - 2), "d", null);      
+                        this.noteLength++;
                     }
                     else
                     {
-                        result[i - 1].note += line + "\n";
+                        this.note[this.noteLength - 1].note += line + "\n";
                     }
                 }
                 reader.Close();
             }
 
-            return result;
+            return this.note;
         }
     }
 }
-//string path = "note1.txt";
-//string text = "Hello World\nHello METANIT.COM";
-
-//// полная перезапись файла 
-//using (StreamWriter writer = new StreamWriter(path, false))
-//{
-//    await writer.WriteLineAsync(text);
-//}
-//// добавление в файл
-//using (StreamWriter writer = new StreamWriter(path, true))
-//{
-//    await writer.WriteLineAsync("Addition");
-//    await writer.WriteAsync("4,5");
-//}
