@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace ProjektX
 {
-    internal class GenerateDesign
+    internal class GenerateBaseDesign
     {
         public Button[] day = new Button[35];
         public Button[] dayOfWeek = new Button[7];
@@ -25,7 +25,7 @@ namespace ProjektX
         public DataBase db;
         public DateTime currentDate;
 
-        public GenerateDesign(Form1 form, DataBase db)
+        public GenerateBaseDesign(Form1 form, DataBase db)
         {
             this.startForm = form;
             this.db = db;
@@ -40,7 +40,7 @@ namespace ProjektX
             this.month.Location = new Point(locationX, locationY);
             this.month.Width = 700 + interval * 7;
             this.month.Height = 60;
-            this.month.Font = new Font("Arial", 16, FontStyle.Bold); ;
+            this.month.Font = new Font("Arial", 16, FontStyle.Bold);
             this.startForm.Controls.Add(this.month);
 
             // дни недели

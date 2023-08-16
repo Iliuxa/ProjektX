@@ -12,11 +12,25 @@ namespace ProjektX
 {
     public partial class FormNote : Form
     {
-        public FormNote()
+        private GenerateNoteDesign generate;
+        private DataBase db;
+        public Button buttonDay;
+
+        public FormNote(Button button, DataBase db)
         {
             InitializeComponent();
+            buttonDay = button;
+            this.db = db;
+            this.generate = new GenerateNoteDesign(this.db, this);
+            this.generate.baseGenerate();
         }
 
+        // Редактировать
+        public void buttonEditClick(object sender, EventArgs e)
+        {
+            Button button = sender as Button;
+            this.generate.getEditForm(button);
+        }
 
     }
 }

@@ -5,15 +5,15 @@ namespace ProjektX
 {
     public partial class Form1 : Form
     {
-        private GenerateDesign generate;
-        private DataBase db;
+        private GenerateBaseDesign generate;
+        public DataBase db;
 
         public Form1()
         {
             InitializeComponent();
 
-            db = new DataBase();
-            generate = new GenerateDesign(this, db);
+            this.db = new DataBase();
+            generate = new GenerateBaseDesign(this, db);
             generate.startGenerate();
             generate.dayGenerate(DateTime.Today);
         }
@@ -23,8 +23,8 @@ namespace ProjektX
         {
             Button button = sender as Button;
 
-            FormNote note = new FormNote();
-            note.Show();
+            FormNote noteForm = new FormNote(button, this.db);
+            noteForm.Show();
         }
 
         // Клик на неделю
@@ -58,6 +58,11 @@ namespace ProjektX
                 date = date.AddMonths(-1);
             }
             generate.dayGenerate(date);
+        }
+
+        public DataBase getBd()
+        {
+            return this.db;
         }
 
         private void button1_Click(object sender, EventArgs e)

@@ -10,10 +10,10 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace ProjektX
 {
-    internal class DataBase
+    public class DataBase
     {
         public NoteDto[] note = new NoteDto[1000];
-        public int noteLength = 0;
+        public int noteLength;
         public int noteLengthMonth = 0;
 
         private string patchDb = "D:\\Internet Exploer\\DataBaseProjektX.txt";
@@ -59,7 +59,7 @@ namespace ProjektX
         }
         
         // Получает все данные из файла
-        private NoteDto[] readFile()
+        public NoteDto[] readFile()
         {
             Regex regex = new Regex(@"{{(.*)}}");
             MatchCollection matches;

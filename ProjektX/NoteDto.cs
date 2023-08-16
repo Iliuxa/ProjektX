@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace ProjektX
 {
-    internal class NoteDto
+    public class NoteDto
     {
         public DateTime date;
-        public string? note;
+        public string note;
 
         public NoteDto() { }
     }
