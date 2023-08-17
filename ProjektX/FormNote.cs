@@ -32,5 +32,19 @@ namespace ProjektX
             this.generate.getEditForm(button);
         }
 
+        // Закрыть редактирование
+        public void buttonCloseEditClick(object sender, EventArgs e)
+        {
+            Button button = sender as Button;
+            this.generate.closeEditForm();
+        }
+
+        // Сохранить
+        public void buttonSaveClick(object sender, EventArgs e)
+        {
+            Button button = sender as Button;
+            this.generate.getEditForm(button);
+        }
+
     }
 }
