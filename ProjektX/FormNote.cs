@@ -15,6 +15,7 @@ namespace ProjektX
         private GenerateNoteDesign generate;
         private DataBase db;
         public Button buttonDay;
+        public bool isButtonCloseEditClick = false;
 
         public FormNote(Button button, DataBase db)
         {
@@ -35,15 +36,17 @@ namespace ProjektX
         // Закрыть редактирование
         public void buttonCloseEditClick(object sender, EventArgs e)
         {
+            isButtonCloseEditClick = true;
             Button button = sender as Button;
-            this.generate.closeEditForm();
+            this.generate.closeEditForm(button);
         }
 
         // Сохранить
         public void buttonSaveClick(object sender, EventArgs e)
         {
             Button button = sender as Button;
-            this.generate.getEditForm(button);
+            this.db.persist(this.generate.getEditData());
+            this.db.flush();
         }
 
     }

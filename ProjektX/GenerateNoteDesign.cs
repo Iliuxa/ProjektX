@@ -15,6 +15,7 @@ namespace ProjektX
         public DataBase db;
         private DateTime date;
         public Label[] noteBox = new Label[10];
+        public Label emptyLabel = new Label();
         public Button[] editButton = new Button[10];
         public Button saveButton = new Button();
         public Button addButton = new Button();
@@ -27,6 +28,8 @@ namespace ProjektX
         private int locationYLabel = 60;
         private int locationXButton = 40;
         private int locationYButton = 60;
+        const string addMode = "Add";
+        public string mode = "Add";
 
         public GenerateNoteDesign(DataBase db, FormNote form)
         {
@@ -37,6 +40,7 @@ namespace ProjektX
 
         public void baseGenerate()
         {
+            bool isEmpty = true;
             this.locationYLabel = 60;
             this.form.Width = 850;
             this.form.Height = 500;
@@ -46,10 +50,11 @@ namespace ProjektX
                 if (db.note[i].date == this.date)
                 {
                     this.noteGenerate(i);
+                    isEmpty = false;
                     break;
                 }
             }
-            this.addSaveGenerate();
+            this.addSaveGenerate(isEmpty);
             this.saveButton.Visible = true;
             this.addButton.Visible = true;
             this.editBox.Visible = false;
@@ -57,29 +62,41 @@ namespace ProjektX
 
         public void getEditForm(Button button)
         {
-            noteBox[noteId].DataBindings.Clear();
+            this.mode = "Add";
+            string buttonName = button.Name == "Add" ? button.Name : button.Name.Remove(0, 1);
+            if (buttonName != addMode)
+            {
+                this.mode = "Edit";
+                noteBox[noteId].DataBindings.Clear();
+                this.noteId = int.Parse(buttonName);
+            }
             this.saveButton.Visible = false;
             this.addButton.Visible = false;
+            this.emptyLabel.Visible = false;
             this.editBox.Visible = true;
             this.closeEditButton.Visible = true;
 
-            this.noteId = int.Parse(button.Name.Remove(0, 1));
-
-            editBox.Width = noteBox[0].Width;
+            editBox.Width = 750;
             editBox.Height = 150;
-            editBox.Location = new Point(this.locationXButton, noteBox[this.labelCount - 1].Bottom + 10);
+            int locY = this.labelCount == 0 ? 100 : noteBox[this.labelCount - 1].Bottom + 10;
+            editBox.Location = new Point(this.locationXButton, locY);
             editBox.Font = new Font("Segoe UI", 14, FontStyle.Regular);
-            editBox.Text = this.noteBox[this.noteId].Text;
-
+            this.closeEditButton.Text = "Добавить";
+            editBox.Text = "";
             //Привязка
-            noteBox[this.noteId].DataBindings.Add(new Binding("Text", editBox, "Text"));
+            if (buttonName != addMode)
+            {
+                editBox.Text = this.noteBox[this.noteId].Text;
+                noteBox[this.noteId].DataBindings.Add(new Binding("Text", editBox, "Text"));
+                this.closeEditButton.Text = "Изменить";
+            }
 
-            this.closeEditButton.Text = "Изменить";
             this.closeEditButton.Name = "closeEdit";
             this.closeEditButton.Width = this.form.Width - 90;
             this.closeEditButton.Height = 45;
             this.closeEditButton.Font = new Font("Arial", 14, FontStyle.Regular);
             this.closeEditButton.Location = new Point(this.locationXButton, this.editBox.Bottom + 15);
+            if (!this.form.isButtonCloseEditClick)
             this.closeEditButton.Click += this.form.buttonCloseEditClick;
 
             this.form.Controls.Add(this.closeEditButton);
@@ -87,17 +104,32 @@ namespace ProjektX
             this.form.Height = this.closeEditButton.Bottom + 60;
         }
 
-        public void closeEditForm()
+        public NoteDto getEditData()
+        {
+            string note = "";
+            for (int i = 0; i < this.labelCount; i++)
+            {
+                note += noteBox[i].Text + "&";
+            }
+            note = note.Substring(0, note.Length - 1);
+            return new NoteDto(this.date, note);
+        }
+
+        public void closeEditForm(Button button = null)
         {
             for (int i = 0; i < this.labelCount; i++)
             {
                 this.noteBox[i].Text = this.noteBox[i].Text;
             }
-            this.deleteBind(); 
+            this.deleteBind();
             this.saveButton.Visible = true;
             this.addButton.Visible = true;
             this.editBox.Visible = false;
             this.closeEditButton.Visible = false;
+            if (this.mode == addMode)
+            {
+                this.getOneNote();
+            }
             regenerateEditForm();
         }
 
@@ -109,8 +141,16 @@ namespace ProjektX
             }
         }
 
+        private void getOneNote()
+        {
+            this.noteBoxGenerate(editBox.Text, this.labelCount);
+            this.buttonGenerate(this.labelCount - 1);
+        }
+
         private void regenerateEditForm()
         {
+            this.saveButton.Enabled = true;
+
             this.locationYLabel = 60;
             for (int i = 0; i < this.labelCount; i++)
             {
@@ -127,23 +167,43 @@ namespace ProjektX
             this.form.Height = this.saveButton.Bottom + 60;
         }
 
-        private void addSaveGenerate()
+        private void addSaveGenerate(bool isEmpty = false)
         {
+            this.emptyLabel.Text = "Пока заметок нет(";
+            this.emptyLabel.Font = new Font("Arial", 15, FontStyle.Bold);
+            this.emptyLabel.Location = new Point(this.locationXLabel, 100);
+            this.emptyLabel.Size = new Size(500, 50);
+            this.form.Controls.Add(this.emptyLabel);
+
             int locationXSave = this.locationXButton;
 
             this.addButton.Width = this.form.Width / 2 - 60;
             this.addButton.Height = 45;
-            this.addButton.Location = new Point(locationXSave, this.editButton[this.labelCount - 1].Bottom + 30);
             this.addButton.Font = new Font("Arial", 14, FontStyle.Regular);
             this.addButton.Click += this.form.buttonEditClick;
-            this.form.Controls.Add(addButton);
             locationXSave += this.addButton.Width + 5;
 
             this.saveButton.Width = this.form.Width / 2 - 60;
             this.saveButton.Height = 45;
-            this.saveButton.Location = new Point(locationXSave, this.editButton[this.labelCount - 1].Bottom + 30);
             this.saveButton.Font = new Font("Arial", 14, FontStyle.Regular);
             this.saveButton.Click += this.form.buttonSaveClick;
+            this.saveButton.Enabled = true;
+
+            if (isEmpty)
+            {
+                this.addButton.Location = new Point(this.locationXButton, this.form. Bottom - 60);
+                this.saveButton.Location = new Point(this.locationXButton + this.addButton.Width + 5, this.form.Bottom - 60);
+                this.saveButton.Enabled = false;
+                this.emptyLabel.Visible = true;
+            }
+            else
+            {
+                this.addButton.Location = new Point(this.locationXButton, this.editButton[this.labelCount - 1].Bottom + 30);
+                this.saveButton.Location = new Point(this.locationXButton + this.addButton.Width + 5, this.editButton[this.labelCount - 1].Bottom + 30);
+                this.emptyLabel.Visible = false;
+            }
+
+            this.form.Controls.Add(addButton);
             this.form.Controls.Add(saveButton);
 
             addButton.Text = "Добавить";
