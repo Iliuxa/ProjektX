@@ -135,6 +135,7 @@ namespace ProjektX
                 text += "{{" + this.note[i].date.ToString("d") + "}}" + "\n";
                 text += this.note[i].note + "\n";
             }
+            text = text.Substring(0, text.Length - 2);
 
             using (FileStream fstream = new FileStream(patchDb, FileMode.Truncate))
             {

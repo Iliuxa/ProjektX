@@ -17,6 +17,7 @@ namespace ProjektX
         public Label[] noteBox = new Label[10];
         public Label emptyLabel = new Label();
         public Button[] editButton = new Button[10];
+        public Button[] deleteButton = new Button[10];
         public Button saveButton = new Button();
         public Button addButton = new Button();
         public Button closeEditButton = new Button();
@@ -24,7 +25,7 @@ namespace ProjektX
         public string[] notes;
         private int noteId;
         private int labelCount = 0;
-        private int locationXLabel = 80;
+        private int locationXLabel = 125;
         private int locationYLabel = 60;
         private int locationXButton = 40;
         private int locationYButton = 60;
@@ -109,10 +110,21 @@ namespace ProjektX
             string note = "";
             for (int i = 0; i < this.labelCount; i++)
             {
-                note += noteBox[i].Text + "&";
+                if (noteBox[i].Text != "")
+                {
+                    note += noteBox[i].Text + "&";
+                }
             }
             note = note.Substring(0, note.Length - 1);
             return new NoteDto(this.date, note);
+        }
+
+        public void deleteNote(Button button)
+        {
+            int deleteId = int.Parse(button.Name.Substring(1));
+            this.noteBox[deleteId].Dispose();
+            this.editButton[deleteId].Dispose();
+            this.deleteButton[deleteId].Dispose();
         }
 
         public void closeEditForm(Button button = null)
@@ -161,6 +173,7 @@ namespace ProjektX
                 this.locationYLabel += this.noteBox[i].Height + 20;
 
                 this.editButton[i].Location = new Point(locationXButton, this.noteBox[i].Top + this.noteBox[i].Height / 2 - 25);
+                this.deleteButton[i].Location = new Point(locationXButton + 45, this.noteBox[i].Top + this.noteBox[i].Height / 2 - 25);
             }
             this.addButton.Location = new Point(locationXButton, this.editButton[this.labelCount - 1].Bottom + 30);
             this.saveButton.Location = new Point(locationXButton + this.addButton.Width + 5, this.editButton[this.labelCount - 1].Bottom + 30);
@@ -236,6 +249,16 @@ namespace ProjektX
             this.editButton[number].Location = new Point(locationXButton, this.noteBox[number].Top + this.noteBox[number].Height / 2 - 25);
             this.editButton[number].Click += this.form.buttonEditClick;
             this.form.Controls.Add(this.editButton[number]);
+
+            this.deleteButton[number] = new Button();
+            this.deleteButton[number].Name = "d" + number;
+            this.deleteButton[number].Image = System.Drawing.Image.FromFile("D:\\Internet Exploer\\ProjektX\\ProjektX\\i.png");
+            this.deleteButton[number].ImageAlign = ContentAlignment.MiddleCenter;
+            this.deleteButton[number].Width = 40;
+            this.deleteButton[number].Height = 40;
+            this.deleteButton[number].Location = new Point(locationXButton + 45, this.noteBox[number].Top + this.noteBox[number].Height / 2 - 25);
+            this.deleteButton[number].Click += this.form.buttonDeleteClick;
+            this.form.Controls.Add(this.deleteButton[number]);
         }
 
         private void noteBoxGenerate(string text, int number)
