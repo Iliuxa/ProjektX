@@ -16,8 +16,8 @@ namespace ProjektX
         public int noteLength;
         public int noteLengthMonth = 0;
 
-        //private string patchDb = "D:\\Internet Exploer\\DataBaseProjektX.txt";
-        private string patchDb = "C:\\Users\\olego\\OneDrive\\Документы\\DataBaseProjektX.txt";
+        private string patchDb = "D:\\Internet Exploer\\DataBaseProjektX.txt";
+        //private string patchDb = "C:\\Users\\olego\\OneDrive\\Документы\\DataBaseProjektX.txt";
 
         public DataBase()
         {
