@@ -36,6 +36,9 @@ namespace ProjektX
         public void DayMenuClick1(object sender, EventArgs e)
         {
             Button button = sender as Button;
+            ToolStripMenuItem copyMenuItem = sender as ToolStripMenuItem;
+            FormColor colorForm = new FormColor(copyMenuItem.Name, this.db, generate);
+            colorForm.Show();
         }
 
         public void DayMenuClick2(object sender, EventArgs e)

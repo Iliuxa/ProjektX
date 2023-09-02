@@ -16,7 +16,8 @@ namespace ProjektX
         public int noteLength;
         public int noteLengthMonth = 0;
 
-        private string patchDb = "D:\\Internet Exploer\\DataBaseProjektX.txt";
+        //private string patchDb = "D:\\Internet Exploer\\DataBaseProjektX.txt";
+        private string patchDb = "C:\\Users\\olego\\OneDrive\\Документы\\DataBaseProjektX.txt";
 
         public DataBase()
         {
@@ -24,7 +25,7 @@ namespace ProjektX
             try
             {
                 fstream = new FileStream(patchDb, FileMode.OpenOrCreate);
-                byte[] buffer = Encoding.Default.GetBytes("{{" + new DateTime().ToString("d") + "}}");
+                byte[] buffer = Encoding.Default.GetBytes("{{" + new DateTime().ToString("d") + "}}\n\n\n\n");
                 fstream.Write(buffer, 0, buffer.Length);
             }
             catch (Exception ex)
@@ -87,6 +88,7 @@ namespace ProjektX
                     }
                     else
                     {
+                        this.note[this.noteLength - 1].color = getColor(ref line);
                         this.note[this.noteLength - 1].note += line + "\n";
                     }
                 }
@@ -95,6 +97,22 @@ namespace ProjektX
             }
 
             return this.note;
+        }
+
+        private string? getColor(ref string line)
+        {
+            if (line.Length < 2 || line.Substring(0,2) != "%%")
+            {
+                return null;
+            }
+            line = line.Substring(2);
+            string substring = "%%";
+            int indexOfSubstring = line.IndexOf(substring);
+           
+            string color = line.Substring(0, indexOfSubstring);
+            line = line.Substring(indexOfSubstring + 2);
+
+            return color;
         }
 
         public void persist(NoteDto newNote)
@@ -109,10 +127,12 @@ namespace ProjektX
                         for (int k = i; k < this.noteLength - 1; k++)
                         {
                             this.note[k] = this.note[k + 1];
+                            this.note[i].color = newNote.color;
                         }
                         return;
                     }
                     this.note[i].note = newNote.note;
+                    this.note[i].color = newNote.color;
                     flagEq = true;
                     break;
                 }
@@ -142,6 +162,10 @@ namespace ProjektX
             for (int i = 0; i < this.noteLength; i++)
             {
                 text += "{{" + this.note[i].date.ToString("d") + "}}" + "\n";
+                if (this.note[i].color != null)
+                {
+                    text += "%%" + this.note[i].color + "%%";
+                }
                 text += this.note[i].note + "\n";
             }
             text = text.Substring(0, text.Length - 1);
