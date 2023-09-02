@@ -11,6 +11,7 @@ namespace ProjektX
         //public Button color;
         public string note;
         public DateTime date;
+        public string? color;
 
         public Day() { }
 

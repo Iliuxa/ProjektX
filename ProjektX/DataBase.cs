@@ -78,7 +78,7 @@ namespace ProjektX
                     {
                         if (this.noteLength != 0 && this.note[this.noteLength - 1].note.Length > 2)
                         {
-                            this.note[this.noteLength - 1].note = this.note[this.noteLength - 1].note.Substring(0, this.note[this.noteLength - 1].note.Length - 2);
+                            this.note[this.noteLength - 1].note = this.note[this.noteLength - 1].note.Substring(0, this.note[this.noteLength - 1].note.Length - 1);
                         }
 
                         line = line.Substring(2);
@@ -90,6 +90,7 @@ namespace ProjektX
                         this.note[this.noteLength - 1].note += line + "\n";
                     }
                 }
+                this.note[this.noteLength - 1].note = this.note[this.noteLength - 1].note.Remove(this.note[this.noteLength - 1].note.Length - 1);
                 reader.Close();
             }
 
@@ -103,6 +104,14 @@ namespace ProjektX
             {
                 if (this.note[i].date == newNote.date)
                 {
+                    if (newNote.note == "")
+                    {
+                        for (int k = i; k < this.noteLength - 1; k++)
+                        {
+                            this.note[k] = this.note[k + 1];
+                        }
+                        return;
+                    }
                     this.note[i].note = newNote.note;
                     flagEq = true;
                     break;
@@ -121,7 +130,7 @@ namespace ProjektX
                     this.note[this.noteLength - 1] = newNote;
                     this.sortDate(this.note[this.noteLength - 1]);
                 }
-                
+
             }
 
         }
@@ -135,7 +144,7 @@ namespace ProjektX
                 text += "{{" + this.note[i].date.ToString("d") + "}}" + "\n";
                 text += this.note[i].note + "\n";
             }
-            text = text.Substring(0, text.Length - 2);
+            text = text.Substring(0, text.Length - 1);
 
             using (FileStream fstream = new FileStream(patchDb, FileMode.Truncate))
             {

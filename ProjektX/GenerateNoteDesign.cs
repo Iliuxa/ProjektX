@@ -115,7 +115,10 @@ namespace ProjektX
                     note += noteBox[i].Text + "&";
                 }
             }
-            note = note.Substring(0, note.Length - 1);
+            if ( note.Length > 0)
+            {
+                note = note.Substring(0, note.Length - 1);
+            }
             return new NoteDto(this.date, note);
         }
 
