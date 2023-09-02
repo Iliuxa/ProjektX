@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace ProjektX
 {
-    internal class GenerateBaseDesign
+    public class GenerateBaseDesign
     {
         public Button[] day = new Button[35];
         public Button[] dayOfWeek = new Button[7];
@@ -66,14 +66,6 @@ namespace ProjektX
             this.dayOfWeek[5].Text = "Сб";
             this.dayOfWeek[6].Text = "Вс";
 
-            // контекстное меню
-            ContextMenuStrip dayMenu = new ContextMenuStrip();
-            ToolStripMenuItem copyMenuItem = new ToolStripMenuItem("Изменить цвет");
-            ToolStripMenuItem pasteMenuItem = new ToolStripMenuItem("Вставить");
-            dayMenu.Items.AddRange(new[] { copyMenuItem, pasteMenuItem });
-            copyMenuItem.Click += this.startForm.DayMenuClick1;
-            pasteMenuItem.Click += this.startForm.DayMenuClick2;
-
             // дни
             locationX = 30;
             locationY += 60 + interval;
@@ -85,7 +77,6 @@ namespace ProjektX
                 this.day[i].Location = new Point(locationX, locationY);
                 this.day[i].Font = fontDay;
                 this.day[i].Click += this.startForm.buttonDayClick;
-                this.day[i].ContextMenuStrip = dayMenu;
 
                 this.startForm.Controls.Add(day[i]);
 
@@ -137,8 +128,18 @@ namespace ProjektX
             int countDb = 0;
             for (int i = 0; i < day.Length; i++)
             {
+                // контекстное меню
+                ContextMenuStrip dayMenu = new ContextMenuStrip();
+                ToolStripMenuItem copyMenuItem = new ToolStripMenuItem("Изменить цвет");
+                ToolStripMenuItem pasteMenuItem = new ToolStripMenuItem("Вставить");
+                dayMenu.Items.AddRange(new[] { copyMenuItem, pasteMenuItem });
+                copyMenuItem.Click += this.startForm.DayMenuClick1;
+                pasteMenuItem.Click += this.startForm.DayMenuClick2;
+
                 this.day[i].Text = startDay.Day.ToString();
                 this.day[i].Name = startDay.ToString("d");
+                copyMenuItem.Name = startDay.ToString("d");
+                this.day[i].ContextMenuStrip = dayMenu;
 
                 if (startDay == DateTime.Today) // покраска сегодняшнего дня
                 {
@@ -150,6 +151,13 @@ namespace ProjektX
                     if (dataDb[countDb].date == startDay)
                     {
                         this.day[i].Text = "\n" + this.day[i].Text + "\n○---";
+
+                        if (dataDb[countDb].color != null)
+                        {
+                            Color realColor = (new NoteDto()).getRealColor(dataDb[countDb].color);
+                            this.day[i].BackColor = realColor;
+                        }
+
                         countDb++;
                     }
                 }

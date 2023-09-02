@@ -17,6 +17,7 @@ namespace ProjektX
         public int noteLengthMonth = 0;
 
         private string patchDb = "D:\\Internet Exploer\\DataBaseProjektX.txt";
+        //private string patchDb = "C:\\Users\\olego\\OneDrive\\Документы\\DataBaseProjektX.txt";
 
         public DataBase()
         {
@@ -24,7 +25,7 @@ namespace ProjektX
             try
             {
                 fstream = new FileStream(patchDb, FileMode.OpenOrCreate);
-                byte[] buffer = Encoding.Default.GetBytes("{{" + new DateTime().ToString("d") + "}}");
+                byte[] buffer = Encoding.Default.GetBytes("{{" + new DateTime().ToString("d") + "}}\n\n\n\n");
                 fstream.Write(buffer, 0, buffer.Length);
             }
             catch (Exception ex)
@@ -78,7 +79,7 @@ namespace ProjektX
                     {
                         if (this.noteLength != 0 && this.note[this.noteLength - 1].note.Length > 2)
                         {
-                            this.note[this.noteLength - 1].note = this.note[this.noteLength - 1].note.Substring(0, this.note[this.noteLength - 1].note.Length - 2);
+                            this.note[this.noteLength - 1].note = this.note[this.noteLength - 1].note.Substring(0, this.note[this.noteLength - 1].note.Length - 1);
                         }
 
                         line = line.Substring(2);
@@ -87,13 +88,31 @@ namespace ProjektX
                     }
                     else
                     {
+                        this.note[this.noteLength - 1].color = getColor(ref line);
                         this.note[this.noteLength - 1].note += line + "\n";
                     }
                 }
+                this.note[this.noteLength - 1].note = this.note[this.noteLength - 1].note.Remove(this.note[this.noteLength - 1].note.Length - 1);
                 reader.Close();
             }
 
             return this.note;
+        }
+
+        private string? getColor(ref string line)
+        {
+            if (line.Length < 2 || line.Substring(0,2) != "%%")
+            {
+                return null;
+            }
+            line = line.Substring(2);
+            string substring = "%%";
+            int indexOfSubstring = line.IndexOf(substring);
+           
+            string color = line.Substring(0, indexOfSubstring);
+            line = line.Substring(indexOfSubstring + 2);
+
+            return color;
         }
 
         public void persist(NoteDto newNote)
@@ -103,7 +122,17 @@ namespace ProjektX
             {
                 if (this.note[i].date == newNote.date)
                 {
+                    if (newNote.note == "")
+                    {
+                        for (int k = i; k < this.noteLength - 1; k++)
+                        {
+                            this.note[k] = this.note[k + 1];
+                            this.note[i].color = newNote.color;
+                        }
+                        return;
+                    }
                     this.note[i].note = newNote.note;
+                    this.note[i].color = newNote.color;
                     flagEq = true;
                     break;
                 }
@@ -121,7 +150,7 @@ namespace ProjektX
                     this.note[this.noteLength - 1] = newNote;
                     this.sortDate(this.note[this.noteLength - 1]);
                 }
-                
+
             }
 
         }
@@ -133,8 +162,13 @@ namespace ProjektX
             for (int i = 0; i < this.noteLength; i++)
             {
                 text += "{{" + this.note[i].date.ToString("d") + "}}" + "\n";
+                if (this.note[i].color != null)
+                {
+                    text += "%%" + this.note[i].color + "%%";
+                }
                 text += this.note[i].note + "\n";
             }
+            text = text.Substring(0, text.Length - 1);
 
             using (FileStream fstream = new FileStream(patchDb, FileMode.Truncate))
             {
